@@ -13,6 +13,7 @@ namespace Microsoft.Azure.Management.ManagementGroups
     using Microsoft.Rest;
     using Microsoft.Rest.Azure;
     using Models;
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -171,7 +172,15 @@ namespace Microsoft.Azure.Management.ManagementGroups
             /// </param>
             public static object CreateOrUpdate(this IManagementGroupsOperations operations, string groupId, CreateManagementGroupRequest createManagementGroupRequest, string cacheControl = "no-cache")
             {
-                return operations.CreateOrUpdateAsync(groupId, createManagementGroupRequest, cacheControl).GetAwaiter().GetResult();
+                var response = operations.CreateOrUpdateAsync(groupId, createManagementGroupRequest, cacheControl).GetAwaiter().GetResult();
+                try
+                {
+                    return (ManagementGroup)response;
+                }
+                catch(Exception e)
+                {
+                    return (ManagementGroup)Get(operations, groupId, cacheControl);
+                }
             }
 
             /// <summary>
